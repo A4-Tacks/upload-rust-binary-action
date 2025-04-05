@@ -519,12 +519,13 @@ if [[ "${INPUT_TAR/all/${platform}}" == "${platform}" ]] \
   rm -rf -- "${tmpdir:?}/${archive}"
 fi
 
-# Checksum of all assets except for .<checksum> files.
+# Checksum of all assets except for .<checksum>sum files.
 final_assets=("${assets[@]}")
+sum_postfix=sum
 for checksum in ${checksums[@]+"${checksums[@]}"}; do
   # TODO: Should we allow customizing the name of checksum files?
   if type -P "${checksum}sum" >/dev/null; then
-    "${checksum}sum" "${assets[@]}" >"${archive}.${checksum}"
+    "${checksum}sum" "${assets[@]}" >"${archive}.${checksum}${sum_postfix}"
   else
     # GitHub-hosted macOS runner does not install GNU Coreutils by default.
     # https://github.com/actions/runner-images/issues/90
@@ -534,14 +535,14 @@ for checksum in ${checksums[@]+"${checksums[@]}"}; do
         ;;
       sha*)
         if type -P shasum >/dev/null; then
-          shasum -a "${checksum#sha}" "${assets[@]}" >"${archive}.${checksum}"
+          shasum -a "${checksum#sha}" "${assets[@]}" >"${archive}.${checksum}${sum_postfix}"
         else
           bail "checksum for '${checksum}' requires '${checksum}sum' or 'shasum' command; consider installing one of them"
         fi
         ;;
       md5)
         if type -P md5 >/dev/null; then
-          md5 "${assets[@]}" >"${archive}.${checksum}"
+          md5 "${assets[@]}" >"${archive}.${checksum}${sum_postfix}"
         else
           bail "checksum for '${checksum}' requires '${checksum}sum' or 'md5' command; consider installing one of them"
         fi
@@ -549,16 +550,16 @@ for checksum in ${checksums[@]+"${checksums[@]}"}; do
       *) bail "unrecognized 'checksum' input option '${checksum}'" ;;
     esac
   fi
-  x cat -- "${archive}.${checksum}"
+  x cat -- "${archive}.${checksum}${sum_postfix}"
 
   if [[ -n "${GITHUB_OUTPUT:-}" ]]; then
-    printf '%s=%s.%s\n' "${checksum}" "${archive}" "${checksum}" >>"${GITHUB_OUTPUT}"
+    printf '%s=%s.%s\n' "${checksum}" "${archive}" "${checksum}${sum_postfix}" >>"${GITHUB_OUTPUT}"
   else
     warn "GITHUB_OUTPUT is not set; skip setting the '${checksum}' output"
-    printf '%s: %s.%s\n' "${checksum}" "${archive}" "${checksum}"
+    printf '%s: %s.%s\n' "${checksum}" "${archive}" "${checksum}${sum_postfix}"
   fi
 
-  final_assets+=("${archive}.${checksum}")
+  final_assets+=("${archive}.${checksum}${sum_postfix}")
 done
 
 if [[ -n "${dry_run}" ]]; then
