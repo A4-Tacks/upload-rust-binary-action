@@ -40,6 +40,7 @@ Currently, this action is basically intended to be used in combination with an a
 | archive             |           | Archive name (non-extension portion of filename) to be uploaded                              | String  | `$bin-$target` |
 | target              | \[2]      | Target triple, default is host triple                                                        | String  | (host triple)  |
 | features            |           | Comma-separated list of cargo build features to enable                                       | String  |                |
+| package             |           | Whether to build with `--package` option                                                     | String  | `none`         |
 | no-default-features |           | Whether to disable cargo build default features                                              | Boolean | `false`        |
 | locked              |           | Whether to build with `--locked` flag                                                        | Boolean | `false`        |
 | tar                 |           | On which platform to distribute the `.tar.gz` file (all, unix, windows, or none)             | String  | `unix`         |
@@ -55,6 +56,7 @@ Currently, this action is basically intended to be used in combination with an a
 | manifest-path       |           | Path to Cargo.toml                                                                           | String  | `Cargo.toml`   |
 | profile             |           | The cargo profile to build. This defaults to the release profile.                            | String  | `release`      |
 | dry-run             |           | Build and compress binaries, but do not upload them (see [action.yml](action.yml) for more)  | Boolean | `false`        |
+| dry-run-intended    |           | Suppress informational `dry-run` warnings, keeping the rest                                  | Boolean | `false`        |
 | codesign            |           | Sign build products using `codesign` on macOS                                                | String  |                |
 | codesign-prefix     |           | Prefix for the `codesign` identifier on macOS                                                | String  |                |
 | codesign-options    |           | Specifies a set of option flags to be embedded in the code signature on macOS. See the `codesign` manpage for details. | String | |
